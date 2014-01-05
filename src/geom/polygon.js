@@ -103,3 +103,75 @@ function d3_geom_polygonClosed(coordinates) {
       b = coordinates[coordinates.length - 1];
   return !(a[0] - b[0] || a[1] - b[1]);
 }
+
+d3_geom_polygonPrototype.intersect = function(subject) {
+  subject.forEach(function(Si) {
+    this.forEach(function(Cj) {
+
+
+    });
+  });
+}
+
+
+function d3_geom_polygonLineSegmentsIntersect(p1, p2, q1, q2) {
+  var r = subtractPoints(p2, p1);
+  var s = subtractPoints(q2, q1);
+
+  var uNumerator = crossProduct(subtractPoints(q1, p1), r);
+  var denominator = crossProduct(r, s);
+
+  if (uNumerator === 0 && denominator === 0) {
+    // colinear, so do they overlap?
+    return ((q1[0] - p1[0] < 0) !== (q1[0] - p2[0] < 0) !== (q2[0] - p1[0] < 0) !== (q2[0] - p2[0] < 0)) ||
+      ((q1[1] - p1[1] < 0) !== (q1[1] - p2[1] < 0) !== (q2[1] - p1[1] < 0) !== (q2[1] - p2[1] < 0));
+  }
+
+  if (denominator === 0) {
+    // lines are paralell
+    return false;
+  }
+
+  var u = uNumerator / denominator;
+  var t = crossProduct(subtractPoints(q1, p1), s) / denominator;
+
+  if ((t >= 0) && (t <= 1) && (u >= 0) && (u <= 1))
+    return [p1[0] + t * r[0], q1[1] + u * s[1]];
+
+}
+
+function crossProduct(point1, point2) {
+  return point1[0] * point2[1] - point1[1] * point2[0];
+}
+
+function subtractPoints(point1, point2) {
+  return [point1[0] - point2[0], point1[1] - point2[1]];
+}
+
+//intersect(P1,P2,Q1,Q2,alphaP,alphaQ)
+  //WEC_P1 = <P1 - Q1 | (Q2 - Q1) >
+  //WEC_P2 = <P2 - Q1 | (Q2 - Q1) >
+  //if (WEC_P1*WEC_P2 <= 0)
+    //WEC_Q1 = <Q1 - P1 | (P2 - P1) >
+    //WEC_Q2 = <Q2 - P1 | (P2 - P1) >
+    //if (WEC_Q1*WEC_Q2 <= 0)
+      //alphaP = WEC_P1/(WEC_P1 - WEC_P2)
+      //alphaQ = WEC_Q1/(WEC_Q1 - WEC_Q2)
+      //return(true); exit
+    //end if
+  //end if
+  //return(false)
+//end intersect
+
+
+//for each vertex Si of subject polygon do
+  //for each vertex Cj of clip polygon do
+    //if intersect(Si,Si+1,Cj,Cj+1,a,b)
+      //I1 = CreateVertex(Si,Si+1,a)
+      //I2 = CreateVertex(Cj,Cj+1,b)
+      //link intersection points I1 and I2
+      //sort I1 into subject polygon
+      //sort I2 into clip polygon
+    //end if
+  //end for
+//end for
